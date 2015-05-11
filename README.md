@@ -1,5 +1,5 @@
 # Portland Bike Works
-Final Project for Albert Kim's upper division data analysis class at Reed College. Analyses data from the open source Portland Ride™ app (enabled by Reed Switchboard) and different aesthetic approaches to this information. The RIDE data was juxtaposed with city data from the Civic Apps website. 
+Final Project for Albert Kim's upper division data analysis class at Reed College. Analyses data from the open source Portland Ride™ app (enabled by Reed Switchboard) and different aesthetic approaches to this information. The RIDE data was juxtaposed with city data from the Civic Apps website. The following three graphs are a selection from those used in my full analysis.
 
 ![ScreenShot](https://github.com/reediemeyers/Images/blob/master/Screen%20Shot%202015-05-10%20at%209.52.33%20PM.png)
 
