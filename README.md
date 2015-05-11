@@ -18,11 +18,13 @@ While the ODOT app is mostly interested in infrastructure, RIDE additionally foc
 
 ## Reporting Bias
 
-Ride rating affects category of entire ride (good bc that is an entire experience, simplifies categories, bad bc generalizes problems to entire ride, cant pinpoint trouble areas - tried to fix that with accident info)
+The way that data is sorted in the RIDE app requires specific attention. Each individual ride receives a rating, which applies to the whole ride. As previously noted, 0 is no comment/neutral, 1 is a good ride, and 2 is a bad ride. A ride rating is a comment on the entire ride experience, which is good for determining preferred bike path but less useful for commenting on the bike amenities of various neighborhoods in PDX.
 
-Small number of users - currently each ride stands alone, not pinned to a single reporter - fine except everyone has different standards for comfort
+RIDE data ratings, in this Beta version, do not yet capture the nuances of a bike ride through PDX. Why was the ride bad? Was it an infrastructure problem, a route problem, or a random occurance? Is there a specific part of PDX that bikers should avoid? To answer the second question using RIDE data would require the researcher to sort RIDE data by what parts of town they went through. 
 
-Accident Data not proportional to ride data, or even city data  - just counts. but still good for some spatial awareness
+In this analysis I tried to add neighborhood variability with city data. Accident counts highlighted on the map, street type, etc. create classifications for neighborhoods. These were proxies for more specific data - the accident data, for example, were not proportional to ride data but are just counts. Still. they provide useful spatial awareness.
+
+Finally, RIDE can only benefit from more app users. Thousands of bike trips are taken each day, and only a small fraction of them captured here. Currently each ride stands alone, not pinned to an identifiable single reporter; everyone has different standards for what a "good" or "bad" ride is, and the data might benefit from randomized IDs attached to each cell device. 
 
 ## Credit
 
