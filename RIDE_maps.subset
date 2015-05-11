@@ -1,0 +1,141 @@
+library(RJSONIO)
+library(dplyr)
+library(ggplot2)
+library(rgdal)
+library(ggmap)
+
+
+#basemap
+PDX.shapefile <- readOGR(dsn=".", layer="tract2010", verbose=FALSE) %>%
+  spTransform(CRS("+proj=longlat +ellps=WGS84")) %>%
+  subset(COUNTY=="051")
+
+PDX.data <- PDX.shapefile@data %>% tbl_df()
+PDX.map <- fortify(PDX.shapefile, region="FIPS") %>% tbl_df()
+
+base.plot <-
+  ggplot(PDX.map, aes(x=long, y=lat, group=group)) +
+  geom_polygon(fill="white") +
+  geom_path(col="black", size=0.5) +
+  coord_map() +
+  theme_bw()
+base.plot
+
+#we explore the ride data
+#map at large
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) + geom_path(alpha=0.5) +
+  scale_x_continuous(limits=c(-123, -122.5)) +
+  scale_y_continuous(limits=c(45.4, 45.6)) +
+  coord_map()
+
+#map focusing on Portland Urban area
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) + geom_path(alpha=0.5) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map()
+
+#there is also data on accident hot spots in the same city
+base.plot +
+  geom_point(data=master.accidents, aes(x=long, y=lat), alpha = 0.4, col="red", size= 4.5) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55))
+
+#we parse apart the RIDE dataset by rating
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) + 
+  geom_path(alpha=0.3, aes(col=rating), lineend = "butt") +
+  scale_color_gradient2(low = "yellow", mid = "green", high = "red") +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map()
+
+#we adjust color
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) + 
+  geom_path(alpha=0.3, aes(col=rating), lineend = "butt") +
+  scale_color_gradient2(low = "white", mid = "aquamarine", high = "mediumvioletred", midpoint = 1) + 
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map()
+
+#we adjust color again
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) +
+  geom_path(alpha=0.3, aes(col=rating), lineend = "butt") +
+  scale_color_gradient2(low = "yellow", mid = "green", high = "red", midpoint=1) +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map()
+
+#see if a new background helps
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) +
+  geom_path(alpha=0.3, aes(col=rating), lineend = "butt") +
+  scale_color_gradient2(low = "yellow", mid = "green", high = "red", midpoint=1) +
+  theme(panel.background = element_rect(fill = 'grey30'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map()
+
+#we add the accident data in
+ggplot(master.coordinates, aes(x=long, y=lat, group=group)) +
+  geom_point(data=master.accidents, aes(x=long, y=lat), alpha = 0.3, col="red", size= 6) +
+  geom_path(alpha=0.3, aes(col=rating), lineend = "butt") +
+  scale_color_gradient2(low = "yellow", mid = "green", high = "red", midpoint=1) +
+  theme(panel.background = element_rect(fill = 'grey30'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map()
+
+#I used this map to get a better sense of where the popular routes ("whtvr", in green, which plots the sites where a RIDE biker transited more than once) were
+#overlapped with accidents (master.accidents, red). It is a difficult comparison, as the RIDE data and accident data come from different ride information - that is, 
+# the accidents depicted here did not necessarily happen to RIDE users. That said, both data sets showed increased ridership or number of accidents on major roads. 
+whtvr <- group_by(master.coordinates, lat, long) %>% summarise(count=n()) %>% filter(count>1) %>% arrange(count)
+base.plot +
+  geom_point(data=whtvr, aes(x=long, y=lat, group=count), alpha = 0.4, col="green", size= 4.5) +
+  geom_point(data=master.accidents, aes(x=long, y=lat), alpha = 0.4, col="red", size= 4.5) +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55))
+
+
+#lets take a closer look at some neighborhoods:
+#note: we use coord_cartesian to maintain a high level of detail at the neighborhood scale
+#industrial
+base.plot +
+  geom_point(data=master.accidents, aes(x=long, y=lat), alpha = 0.4, col="red", size= 4.5) +
+  geom_path(data = master.coordinates, alpha=0.3, aes(col=rating), lineend = "butt") +
+  coord_cartesian(xlim=c(-122.67, -122.65), ylim=c(45.50, 45.52)) +
+  scale_color_gradient2(low = "yellow", mid = "green", high = "red", midpoint=1) +
+  theme(panel.background = element_rect(fill = 'grey30'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+#downtown
+base.plot +
+  geom_point(data=master.accidents, aes(x=long, y=lat), alpha = 0.4, col="red", size= 4.5) +
+  geom_path(data = master.coordinates, alpha=0.3, aes(col=rating), lineend = "butt") +
+  coord_cartesian(xlim=c(-122.70, -122.67), ylim=c(45.51, 45.53)) +
+  scale_color_gradient2(low = "yellow", mid = "green", high = "red", midpoint=1) +
+  theme(panel.background = element_rect(fill = 'grey30'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+#and we can add google map data, but it looks awful
+google.map <-
+  get_map(location = "Portland, OR", maptype = "roadmap", zoom = "auto", color = "bw", messaging = FALSE, force = ifelse(source == "google", TRUE, TRUE))
+ggmap(google.map) +
+  geom_point(data=master.accidents, aes(x=long, y=lat), alpha=0.5, col="red", size= 4.5) +
+  geom_path(data=master.coordinates, alpha=0.3, aes(x=long, y=lat, group=group, col=rating), lineend = "butt") +
+  scale_x_continuous(limits=c(-122.7, -122.6)) +
+  scale_y_continuous(limits=c(45.475, 45.55)) +
+  coord_map() +
+  xlab("longitude") + ylab("latitude")
+
+
+

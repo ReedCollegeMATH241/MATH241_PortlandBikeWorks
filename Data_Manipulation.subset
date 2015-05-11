@@ -1,0 +1,77 @@
+library(RJSONIO)
+library(dplyr)
+library(ggplot2)
+library(rgdal)
+library(ggmap)
+
+#laod in data
+PDX <- fromJSON("trips.json")
+accidents <- fromJSON("portland_accidents.json")
+
+##ride data
+# Extract information for first ride
+orig.coordinates <- PDX[["features"]][[1]]$geometry$coordinates %>% unlist() %>% matrix(ncol=2, byrow=TRUE)
+coordinates <- data.frame(
+  lat = orig.coordinates[, 1],
+  long = orig.coordinates[, 2],
+  activity_type = PDX[["features"]][[1]]$properties["activity_type"],
+  rating = PDX[["features"]][[1]]$properties["rating"],
+  group = 1
+)
+
+# Create master data.frame
+master.coordinates <- coordinates
+
+# Append information for 2nd thru last ride
+for(i in 2:length(PDX[["features"]])){
+  orig.coordinates <- PDX[["features"]][[i]]$geometry$coordinates %>% unlist() %>% matrix(ncol=2, byrow=TRUE)
+  coordinates <- data.frame(
+    lat = orig.coordinates[, 1],
+    long = orig.coordinates[, 2],
+    activity_type = PDX[["features"]][[i]]$properties["activity_type"],
+    rating = PDX[["features"]][[i]]$properties["rating"],
+    group = i
+  )
+  master.coordinates <- bind_rows(master.coordinates, coordinates)
+  
+  if(PDX[["features"]][[i]]$geometry$type != "LineString")
+    print(i)
+}
+
+##accident data
+# Extract information for first accident
+accidents.first<- accidents$accidents[[1]] %>% unlist() %>% matrix(ncol=1, byrow=TRUE)
+#hack style
+accidata1 <- data.frame(
+  lat = accidents.first[ 6,],
+  long = accidents.first[ 7,],
+  street1 = accidents.first[ 1,],
+  street2 = accidents.first[ 2,],
+  no.accidents = accidents.first[ 4,],
+  year = accidents.first[ 5,],
+  crashID = accidents.first[ 8,],
+  group = 1
+)
+
+# Create master data.frame
+master.accidents <- accidata1
+
+# Append information for 2nd thru last ride
+for(i in 2:length(accidents[["accidents"]])){
+  accidents.all<- accidents$accidents[[i]] %>% unlist() %>% matrix(ncol=1, byrow=TRUE)
+  accidata <- data.frame(
+    lat = accidents.all[ 6,],
+    long = accidents.all[ 7,],
+    street1 = accidents.all[ 1,],
+    street2 = accidents.all[ 2,],
+    no.accidents = accidents.all[ 4,],
+    year = accidents.all[ 5,],
+    crashID = accidents.all[ 8,],
+    group = i
+  )
+  master.accidents <- bind_rows(master.accidents, accidata)
+  
+}
+
+master.accidents$lat <- as.numeric(master.accidents$lat)
+master.accidents$long <- as.numeric(master.accidents$long)
