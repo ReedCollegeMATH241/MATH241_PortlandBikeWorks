@@ -1,6 +1,17 @@
 # Portland Bike Works
 Final Project for Albert Kim's upper division data analysis class at Reed College. Analyses data from the open source Portland Ride™ app (enabled by Reed Switchboard) and different aesthetic approaches to this information. The RIDE data was juxtaposed with city data from the Civic Apps website. 
 
+![ScreenShot](https://github.com/reediemeyers/Images/blob/master/Screen%20Shot%202015-05-10%20at%209.52.33%20PM.png)
+
+The RIDE data incorperated over XXX rides from the past year. With a tap to begin a ride, and a tap at the end, bikers can rate their ride experience. 0 is no comment/neutral, 1 is a good ride, and 2 is a bad ride.
+
+![ScreenShot](https://github.com/reediemeyers/Images/blob/master/Screen%20Shot%202015-05-10%20at%209.52.02%20PM.png)
+
+When juxtaposed with accidents in the area, we see more accidents on the bridge-proximate roads and on the poorly rated roads. On the more well-used roads we see more accidents as a function of that increased use. 
+
+![ScreenShot](https://github.com/reediemeyers/Images/blob/master/Screen%20Shot%202015-05-10%20at%209.44.04%20PM.png)
+
+When accidents are mapped onto road type (as designated by Portland Metro), it appears at-a-glance that the wider boulevards with bike accomodation are less dangerous than the smaller lanes. (MTRAIL = Multi-Use Trail; LANE = Bike Lane; BLVD = Bike Boulevard; SCONN = Signed Connection)
 
 In short, this was a preliminary exploration of the RIDE data in the context of the CivicApps data. RIDE's rating system needs some adjustment - at the moment, it is difficult to parse apart what *parts* of a ride went well in relation to specific city infrastructure qualities like road type or accident frequency. 
 
